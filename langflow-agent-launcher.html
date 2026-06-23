@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Langflow Agent Launcher</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f7fb;
+        --panel: #ffffff;
+        --ink: #17202c;
+        --muted: #667085;
+        --line: #d6dce8;
+        --accent: #0f766e;
+        --accent-strong: #0b5f59;
+        --danger: #b42318;
+        --shadow: 0 18px 45px rgba(23, 32, 44, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      .shell {
+        width: min(1180px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 28px 0 36px;
+      }
+
+      header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.7rem, 3vw, 2.5rem);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 1rem;
+      }
+
+      .status {
+        min-width: 190px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #eef6f5;
+        color: var(--accent-strong);
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .panel,
+      .preview {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .tab {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #f8fafc;
+        color: var(--muted);
+        font: inherit;
+        font-weight: 650;
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+
+      .tab[aria-selected="true"] {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+
+      .mode {
+        display: none;
+      }
+
+      .mode.active {
+        display: block;
+      }
+
+      label {
+        display: block;
+        margin: 14px 0 7px;
+        font-size: 0.88rem;
+        font-weight: 700;
+      }
+
+      textarea,
+      input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+        color: var(--ink);
+        font: inherit;
+        font-size: 0.95rem;
+        outline: none;
+      }
+
+      textarea {
+        min-height: 250px;
+        resize: vertical;
+        padding: 12px;
+        font-family:
+          "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono",
+          monospace;
+        font-size: 0.85rem;
+        line-height: 1.45;
+      }
+
+      input {
+        height: 42px;
+        padding: 0 12px;
+      }
+
+      textarea:focus,
+      input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      button {
+        min-height: 40px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 0 14px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .primary {
+        background: var(--accent);
+        color: white;
+      }
+
+      .primary:hover {
+        background: var(--accent-strong);
+      }
+
+      .secondary {
+        background: #f8fafc;
+        border-color: var(--line);
+        color: var(--ink);
+      }
+
+      .secondary:hover {
+        background: #eef2f7;
+      }
+
+      .hint,
+      .error {
+        margin: 12px 0 0;
+        font-size: 0.9rem;
+        line-height: 1.45;
+      }
+
+      .hint {
+        color: var(--muted);
+      }
+
+      .error {
+        display: none;
+        color: var(--danger);
+        font-weight: 700;
+      }
+
+      .preview {
+        min-height: 690px;
+        overflow: hidden;
+      }
+
+      .preview-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid var(--line);
+        padding: 12px 14px;
+        background: #fbfcfe;
+      }
+
+      .preview-title {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-weight: 750;
+      }
+
+      .preview-frame {
+        width: 100%;
+        height: 640px;
+        border: 0;
+        background: white;
+      }
+
+      @media (max-width: 860px) {
+        header {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .status {
+          text-align: left;
+        }
+
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .preview,
+        .preview-frame {
+          min-height: 600px;
+          height: 600px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div>
+          <h1>Langflow Agent Launcher</h1>
+          <p class="subtitle">Paste a Langflow embed snippet or enter a flow ID.</p>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </header>
+
+      <section class="layout">
+        <div class="panel">
+          <div class="tabs" role="tablist" aria-label="Launch mode">
+            <button class="tab" id="snippetTab" role="tab" aria-selected="true">
+              Embed Snippet
+            </button>
+            <button class="tab" id="flowTab" role="tab" aria-selected="false">
+              Flow ID
+            </button>
+          </div>
+
+          <div class="mode active" id="snippetMode">
+            <label for="snippet">Embed snippet</label>
+            <textarea
+              id="snippet"
+              spellcheck="false"
+              placeholder='<script src="..."></script>&#10;<langflow-chat host_url="..." flow_id="..." chat_window_title="My Agent"></langflow-chat>'
+            ></textarea>
+          </div>
+
+          <div class="mode" id="flowMode">
+            <label for="hostUrl">Langflow host URL</label>
+            <input id="hostUrl" placeholder="https://your-langflow-url.example" />
+
+            <label for="flowId">Flow ID</label>
+            <input id="flowId" placeholder="Paste the flow ID from the URL or Share panel" />
+
+            <label for="scriptUrl">Widget script URL</label>
+            <input
+              id="scriptUrl"
+              placeholder="Paste the script src from Langflow's embed snippet"
+            />
+
+            <label for="agentTitle">Chat title</label>
+            <input id="agentTitle" value="My Agent" />
+          </div>
+
+          <div class="actions">
+            <button class="primary" id="launchBtn">Launch Agent</button>
+            <button class="secondary" id="clearBtn">Clear</button>
+          </div>
+
+          <p class="error" id="error"></p>
+          <p class="hint">
+            This page is only a launcher. The agent still runs on the shared Langflow
+            instance, using the model key configured there.
+          </p>
+        </div>
+
+        <div class="preview">
+          <div class="preview-bar">
+            <div class="preview-title" id="previewTitle">Agent preview</div>
+            <button class="secondary" id="openBtn">Open Full Page</button>
+          </div>
+          <iframe
+            class="preview-frame"
+            id="previewFrame"
+            title="Langflow agent preview"
+          ></iframe>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const snippetTab = document.querySelector("#snippetTab");
+      const flowTab = document.querySelector("#flowTab");
+      const snippetMode = document.querySelector("#snippetMode");
+      const flowMode = document.querySelector("#flowMode");
+      const snippet = document.querySelector("#snippet");
+      const hostUrl = document.querySelector("#hostUrl");
+      const flowId = document.querySelector("#flowId");
+      const scriptUrl = document.querySelector("#scriptUrl");
+      const agentTitle = document.querySelector("#agentTitle");
+      const launchBtn = document.querySelector("#launchBtn");
+      const clearBtn = document.querySelector("#clearBtn");
+      const openBtn = document.querySelector("#openBtn");
+      const previewFrame = document.querySelector("#previewFrame");
+      const previewTitle = document.querySelector("#previewTitle");
+      const status = document.querySelector("#status");
+      const error = document.querySelector("#error");
+
+      let activeMode = "snippet";
+      let currentPreviewHtml = "";
+
+      const saved = JSON.parse(localStorage.getItem("langflowLauncher") || "{}");
+      snippet.value = saved.snippet || "";
+      hostUrl.value = saved.hostUrl || "";
+      flowId.value = saved.flowId || "";
+      scriptUrl.value = saved.scriptUrl || "";
+      agentTitle.value = saved.agentTitle || "My Agent";
+
+      function setMode(mode) {
+        activeMode = mode;
+        snippetTab.setAttribute("aria-selected", mode === "snippet");
+        flowTab.setAttribute("aria-selected", mode === "flow");
+        snippetMode.classList.toggle("active", mode === "snippet");
+        flowMode.classList.toggle("active", mode === "flow");
+        clearError();
+      }
+
+      function clearError() {
+        error.style.display = "none";
+        error.textContent = "";
+      }
+
+      function showError(message) {
+        error.textContent = message;
+        error.style.display = "block";
+        status.textContent = "Needs attention";
+      }
+
+      function escapeAttribute(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+      }
+
+      function normalizeHost(value) {
+        return value.trim().replace(/\/+$/, "");
+      }
+
+      function extractFromSnippet(rawSnippet) {
+        const doc = new DOMParser().parseFromString(rawSnippet, "text/html");
+        const script = [...doc.querySelectorAll("script[src]")].find((item) =>
+          item.getAttribute("src").toLowerCase().includes("langflow")
+        );
+        const chat = doc.querySelector("langflow-chat");
+
+        if (!script || !chat) {
+          throw new Error(
+            "Paste the full Langflow embed snippet, including the script tag and langflow-chat tag."
+          );
+        }
+
+        return {
+          scriptSrc: script.getAttribute("src"),
+          host: chat.getAttribute("host_url") || "",
+          flow: chat.getAttribute("flow_id") || "",
+          title: chat.getAttribute("chat_window_title") || "My Agent",
+          rawChat: chat.outerHTML,
+        };
+      }
+
+      function buildFromFields() {
+        const host = normalizeHost(hostUrl.value);
+        const flow = flowId.value.trim();
+        const scriptSrc = scriptUrl.value.trim();
+        const title = agentTitle.value.trim() || "My Agent";
+
+        if (!host || !flow || !scriptSrc) {
+          throw new Error("Host URL, flow ID, and widget script URL are required.");
+        }
+
+        return {
+          scriptSrc,
+          host,
+          flow,
+          title,
+          rawChat: `<langflow-chat host_url="${escapeAttribute(host)}" flow_id="${escapeAttribute(flow)}" chat_window_title="${escapeAttribute(title)}"></langflow-chat>`,
+        };
+      }
+
+      function buildPreviewHtml(config) {
+        const title = escapeAttribute(config.title || "My Agent");
+        return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${title}</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #ffffff;
+      }
+      .page {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 34px;
+        text-align: center;
+      }
+      h1 {
+        margin: 0;
+        color: #17202c;
+        font-size: clamp(1.8rem, 5vw, 3rem);
+        letter-spacing: 0;
+      }
+      p {
+        margin: 12px 0 0;
+        color: #667085;
+        font-size: 1rem;
+      }
+    </style>
+    <script src="${escapeAttribute(config.scriptSrc)}"><\/script>
+  </head>
+  <body>
+    <section class="page">
+      <div>
+        <h1>${title}</h1>
+        <p>Your Langflow agent is running on this webpage.</p>
+      </div>
+    </section>
+    ${config.rawChat}
+  </body>
+</html>`;
+      }
+
+      function saveState() {
+        localStorage.setItem(
+          "langflowLauncher",
+          JSON.stringify({
+            snippet: snippet.value,
+            hostUrl: hostUrl.value,
+            flowId: flowId.value,
+            scriptUrl: scriptUrl.value,
+            agentTitle: agentTitle.value,
+          })
+        );
+      }
+
+      function launch() {
+        clearError();
+        try {
+          const config =
+            activeMode === "snippet"
+              ? extractFromSnippet(snippet.value)
+              : buildFromFields();
+
+          currentPreviewHtml = buildPreviewHtml(config);
+          previewFrame.srcdoc = currentPreviewHtml;
+          previewTitle.textContent = config.title || "Agent preview";
+          status.textContent = "Agent loaded";
+          saveState();
+        } catch (launchError) {
+          showError(launchError.message);
+        }
+      }
+
+      function clearAll() {
+        snippet.value = "";
+        hostUrl.value = "";
+        flowId.value = "";
+        scriptUrl.value = "";
+        agentTitle.value = "My Agent";
+        previewFrame.removeAttribute("srcdoc");
+        previewTitle.textContent = "Agent preview";
+        status.textContent = "Ready";
+        currentPreviewHtml = "";
+        localStorage.removeItem("langflowLauncher");
+        clearError();
+      }
+
+      function openFullPage() {
+        if (!currentPreviewHtml) {
+          showError("Launch an agent first.");
+          return;
+        }
+        const previewBlob = new Blob([currentPreviewHtml], { type: "text/html" });
+        window.open(URL.createObjectURL(previewBlob), "_blank", "noopener,noreferrer");
+      }
+
+      snippetTab.addEventListener("click", () => setMode("snippet"));
+      flowTab.addEventListener("click", () => setMode("flow"));
+      launchBtn.addEventListener("click", launch);
+      clearBtn.addEventListener("click", clearAll);
+      openBtn.addEventListener("click", openFullPage);
+    </script>
+  </body>
+</html>
