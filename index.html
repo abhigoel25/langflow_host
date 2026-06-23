@@ -314,6 +314,14 @@
             <input id="agentTitle" value="My Agent" />
           </div>
 
+          <label for="apiKey">Langflow API key</label>
+          <input
+            id="apiKey"
+            type="password"
+            autocomplete="off"
+            placeholder="Paste a Langflow API key, not a model provider key"
+          />
+
           <div class="actions">
             <button class="primary" id="launchBtn">Launch Agent</button>
             <button class="secondary" id="clearBtn">Clear</button>
@@ -350,6 +358,7 @@
       const flowId = document.querySelector("#flowId");
       const scriptUrl = document.querySelector("#scriptUrl");
       const agentTitle = document.querySelector("#agentTitle");
+      const apiKey = document.querySelector("#apiKey");
       const launchBtn = document.querySelector("#launchBtn");
       const clearBtn = document.querySelector("#clearBtn");
       const openBtn = document.querySelector("#openBtn");
@@ -362,7 +371,7 @@
       let currentPreviewHtml = "";
 
       const saved = JSON.parse(localStorage.getItem("langflowLauncher") || "{}");
-      snippet.value = saved.snippet || "";
+      snippet.value = "";
       hostUrl.value = saved.hostUrl || "";
       flowId.value = saved.flowId || "";
       scriptUrl.value = saved.scriptUrl || "";
@@ -406,6 +415,7 @@
           item.getAttribute("src").toLowerCase().includes("langflow")
         );
         const chat = doc.querySelector("langflow-chat");
+        const key = apiKey.value.trim() || chat?.getAttribute("api_key") || "";
 
         if (!script || !chat) {
           throw new Error(
@@ -413,11 +423,20 @@
           );
         }
 
+        if (!key) {
+          throw new Error("Paste a Langflow API key before launching.");
+        }
+
+        chat.setAttribute("api_key", key);
+
         return {
           scriptSrc: script.getAttribute("src"),
           host: chat.getAttribute("host_url") || "",
           flow: chat.getAttribute("flow_id") || "",
-          title: chat.getAttribute("chat_window_title") || "My Agent",
+          title:
+            chat.getAttribute("window_title") ||
+            chat.getAttribute("chat_window_title") ||
+            "My Agent",
           rawChat: chat.outerHTML,
         };
       }
@@ -427,9 +446,10 @@
         const flow = flowId.value.trim();
         const scriptSrc = scriptUrl.value.trim();
         const title = agentTitle.value.trim() || "My Agent";
+        const key = apiKey.value.trim();
 
-        if (!host || !flow || !scriptSrc) {
-          throw new Error("Host URL, flow ID, and widget script URL are required.");
+        if (!host || !flow || !scriptSrc || !key) {
+          throw new Error("Host URL, flow ID, widget script URL, and Langflow API key are required.");
         }
 
         return {
@@ -437,7 +457,7 @@
           host,
           flow,
           title,
-          rawChat: `<langflow-chat host_url="${escapeAttribute(host)}" flow_id="${escapeAttribute(flow)}" chat_window_title="${escapeAttribute(title)}"></langflow-chat>`,
+          rawChat: `<langflow-chat host_url="${escapeAttribute(host)}" flow_id="${escapeAttribute(flow)}" api_key="${escapeAttribute(key)}" window_title="${escapeAttribute(title)}"></langflow-chat>`,
         };
       }
 
@@ -493,7 +513,6 @@
         localStorage.setItem(
           "langflowLauncher",
           JSON.stringify({
-            snippet: snippet.value,
             hostUrl: hostUrl.value,
             flowId: flowId.value,
             scriptUrl: scriptUrl.value,
@@ -526,6 +545,7 @@
         flowId.value = "";
         scriptUrl.value = "";
         agentTitle.value = "My Agent";
+        apiKey.value = "";
         previewFrame.removeAttribute("srcdoc");
         previewTitle.textContent = "Agent preview";
         status.textContent = "Ready";
