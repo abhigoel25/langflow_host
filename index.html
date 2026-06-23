@@ -78,7 +78,7 @@
       .shell {
         width: min(1240px, calc(100vw - 32px));
         margin: 0 auto;
-        padding: 28px 0 42px;
+        padding: 24px 0 42px;
       }
 
       .topbar {
@@ -86,7 +86,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 18px;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
       }
 
       .brand {
@@ -173,7 +173,7 @@
       .panel-head,
       .preview-head {
         border-bottom: 1px solid var(--line);
-        padding: 18px 18px 16px;
+        padding: 16px 18px 14px;
       }
 
       .panel-head h2,
@@ -192,14 +192,14 @@
       }
 
       .panel-body {
-        padding: 18px;
+        padding: 16px;
       }
 
       .step-strip {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 8px;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
       }
 
       .step {
@@ -207,7 +207,7 @@
         border: 1px solid var(--line);
         border-radius: var(--radius);
         background: var(--surface-soft);
-        padding: 9px 8px;
+        padding: 7px 8px;
       }
 
       .step strong {
@@ -295,7 +295,7 @@
       }
 
       textarea {
-        min-height: 216px;
+        min-height: 156px;
         max-height: 420px;
         resize: vertical;
         padding: 12px;
@@ -335,12 +335,12 @@
       }
 
       .notice {
-        margin-top: 14px;
+        margin-top: 12px;
         border: 1px solid rgba(39, 76, 119, 0.16);
         border-radius: var(--radius);
         background: var(--blue-soft);
         color: #24425f;
-        padding: 11px 12px;
+        padding: 9px 11px;
         font-size: 0.86rem;
         line-height: 1.45;
       }
@@ -349,7 +349,7 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 10px;
-        margin-top: 16px;
+        margin-top: 14px;
       }
 
       .btn {
@@ -382,6 +382,12 @@
 
       .btn-secondary:hover {
         background: var(--surface-soft);
+      }
+
+      .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+        box-shadow: none;
       }
 
       .btn:focus-visible,
@@ -669,10 +675,6 @@
               </p>
             </div>
 
-            <div class="notice">
-              API keys and snippets stay in the browser tab and are not saved by this page.
-            </div>
-
             <div class="actions">
               <button class="btn btn-primary" id="launchBtn" type="button">
                 Launch Agent
@@ -680,6 +682,10 @@
               <button class="btn btn-secondary" id="clearBtn" type="button">
                 Reset
               </button>
+            </div>
+
+            <div class="notice">
+              API keys and snippets stay in the browser tab and are not saved by this page.
             </div>
 
             <p class="error" id="error" role="alert"></p>
