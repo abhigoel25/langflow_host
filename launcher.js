@@ -21,32 +21,49 @@ const widgetDefaults = {
     boxShadow: "0 16px 34px rgba(255, 178, 36, 0.4)",
   },
   chat_window_style: {
+    backgroundColor: "#11151f",
+    border: "1px solid #2e3a4f",
     borderRadius: "18px",
-    border: "1px solid #232b3b",
     boxShadow: "0 28px 70px rgba(0, 0, 0, 0.55)",
+    color: "#eef2fa",
   },
   user_message_style: {
     backgroundColor: "#ffb224",
     color: "#241803",
     borderRadius: "14px",
+    padding: "10px 13px",
   },
   bot_message_style: {
     backgroundColor: "#161b27",
     color: "#eef2fa",
     borderRadius: "14px",
+    border: "1px solid #232b3b",
+    padding: "10px 13px",
   },
   input_container_style: {
-    borderTop: "1px solid #232b3b",
     backgroundColor: "#11151f",
+    borderTop: "1px solid #232b3b",
+    padding: "12px",
   },
+  // backgroundColor here is the fix for invisible (white-on-white) typed text
   input_style: {
+    backgroundColor: "#161b27",
+    color: "#eef2fa",
     border: "1px solid #2e3a4f",
     borderRadius: "12px",
-    color: "#eef2fa",
+    padding: "11px 13px",
   },
   send_button_style: {
     backgroundColor: "#ffb224",
     color: "#241803",
+    borderRadius: "12px",
+  },
+  send_icon_style: {
+    color: "#241803",
+  },
+  error_message_style: {
+    backgroundColor: "rgba(255, 111, 97, 0.12)",
+    color: "#ffb3aa",
     borderRadius: "12px",
   },
 };

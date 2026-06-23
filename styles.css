@@ -55,6 +55,11 @@
   box-sizing: border-box;
 }
 
+/* The hidden attribute must always win, even over the display rules below */
+[hidden] {
+  display: none !important;
+}
+
 html {
   min-width: 320px;
   -webkit-text-size-adjust: 100%;
@@ -289,19 +294,21 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
-  margin-bottom: 22px;
-  counter-reset: step;
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
 }
 .seq-step {
   position: relative;
-  padding: 4px 4px 4px 0;
+  padding: 4px 0;
 }
+/* connector: from the right edge of this circle to just before the next one */
 .seq-step::before {
   content: "";
   position: absolute;
-  left: 13px;
-  right: -8px;
-  top: 13px;
+  top: 17px;
+  left: 36px;
+  right: 8px;
   height: 2px;
   background: var(--line);
   z-index: 0;
