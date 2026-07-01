@@ -770,6 +770,320 @@ input:focus {
   }
 }
 
+/* =========================================================================
+   Scheduler workspace
+   ========================================================================= */
+
+/* ---- Workspace view switch (topbar) ------------------------------------- */
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.view-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+.view-tab {
+  min-height: 38px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.16s ease, background 0.16s ease;
+}
+.view-tab:hover {
+  color: var(--ink-2);
+}
+.view-tab[aria-selected="true"] {
+  background: var(--surface-hover);
+  color: var(--ink);
+  box-shadow: var(--inset-hi);
+}
+.view-tab:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.view {
+  display: none;
+}
+.view.active {
+  display: block;
+  animation: fade 0.28s ease both;
+}
+
+/* ---- Frequency segmented control ---------------------------------------- */
+.seg-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.seg-4 .tab {
+  font-size: 0.84rem;
+  padding: 0 6px;
+}
+.tab[aria-selected="true"] {
+  background: var(--surface-hover);
+  color: var(--ink);
+  box-shadow: var(--inset-hi);
+}
+
+/* ---- Interval + select controls ----------------------------------------- */
+.interval-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+.interval-row input {
+  font-family: var(--font-mono);
+}
+.interval-unit {
+  display: inline-flex;
+  align-items: center;
+  height: var(--control);
+  padding: 0 16px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+}
+select {
+  width: 100%;
+  height: var(--control);
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink);
+  outline: none;
+  font: inherit;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+select:hover {
+  border-color: #384459;
+}
+select:focus {
+  border-color: var(--amber);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--amber-soft);
+}
+
+.chip[data-state="running"] {
+  color: var(--amber-bright);
+  border-color: var(--amber-line);
+  background: var(--amber-soft);
+}
+
+.btn-sm {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 0.8rem;
+}
+
+/* ---- Scheduler right column --------------------------------------------- */
+.sched-stage {
+  position: relative;
+  min-height: clamp(520px, 60vh, 720px);
+}
+.empty-preview {
+  min-height: clamp(520px, 60vh, 720px);
+}
+.sched-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+}
+
+/* ---- Task cards --------------------------------------------------------- */
+.task-list {
+  display: grid;
+  gap: 10px;
+}
+.task-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  padding: 14px 15px;
+}
+.task-card[data-enabled="false"] {
+  opacity: 0.62;
+}
+.task-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.task-card-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.task-card-cadence {
+  margin: 3px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  color: var(--amber);
+}
+.task-card-actions {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink-2);
+  transition: color 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+}
+.icon-btn:hover {
+  background: var(--surface-hover);
+  color: var(--ink);
+  border-color: #3b475c;
+}
+.icon-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.icon-btn.danger:hover {
+  color: var(--danger);
+  border-color: rgba(255, 111, 97, 0.4);
+}
+.task-card-prompt {
+  margin: 11px 0 0;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  max-height: 3.4em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.task-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 11px;
+}
+.task-card-meta span {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.task-card-meta b {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.task-card-meta .ok {
+  color: var(--live);
+}
+.task-card-meta .fail {
+  color: var(--danger);
+}
+
+/* ---- Run log ------------------------------------------------------------ */
+.log-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+  margin-top: 2px;
+}
+.log-head h3 {
+  margin: 0;
+  padding-top: 14px;
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+.run-log {
+  display: grid;
+  gap: 8px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.log-entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left-width: 3px;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.log-entry[data-status="ok"] {
+  border-left-color: var(--live);
+}
+.log-entry[data-status="error"] {
+  border-left-color: var(--danger);
+}
+.log-entry[data-status="running"] {
+  border-left-color: var(--amber);
+}
+.log-when {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.log-main {
+  min-width: 0;
+}
+.log-task {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.log-msg {
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 8.5em;
+  overflow-y: auto;
+}
+.log-entry[data-status="ok"] .log-task { color: var(--live); }
+.log-entry[data-status="error"] .log-task { color: var(--danger); }
+
+@media (max-width: 560px) {
+  .interval-row {
+    grid-template-columns: 1fr;
+  }
+  .seg-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* ---- Motion preferences ------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *,

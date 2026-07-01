@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Morning briefing",
+    "host": "http://localhost:7860",
+    "flowId": "d6c10bc7-91c9-4bb2-95e1-f0c0058a131f",
+    "apiKey": "sk-your-langflow-api-key",
+    "prompt": "Summarize today's top priorities and give me a short briefing.",
+    "freq": "daily",
+    "intervalN": 6,
+    "timeOfDay": "09:00",
+    "weekday": 1,
+    "enabled": true
+  },
+  {
+    "name": "Inbox sweep",
+    "host": "http://localhost:7860",
+    "flowId": "d6c10bc7-91c9-4bb2-95e1-f0c0058a131f",
+    "apiKey": "sk-your-langflow-api-key",
+    "prompt": "Check for anything urgent and flag it.",
+    "freq": "hours",
+    "intervalN": 2,
+    "timeOfDay": "09:00",
+    "weekday": 1,
+    "enabled": true
+  }
+]

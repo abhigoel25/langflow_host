@@ -32,6 +32,28 @@
           </div>
         </div>
         <div class="top-actions">
+          <div class="view-switch" role="tablist" aria-label="Workspace">
+            <button
+              class="view-tab"
+              id="launchViewTab"
+              type="button"
+              role="tab"
+              aria-controls="viewLaunch"
+              aria-selected="true"
+            >
+              Launch
+            </button>
+            <button
+              class="view-tab"
+              id="scheduleViewTab"
+              type="button"
+              role="tab"
+              aria-controls="viewSchedule"
+              aria-selected="false"
+            >
+              Schedule
+            </button>
+          </div>
           <div class="status" id="status" role="status" aria-live="polite" data-state="idle">
             <span class="status-dot" aria-hidden="true"></span>
             <span id="statusText">Standby</span>
@@ -39,6 +61,7 @@
         </div>
       </header>
 
+      <div class="view active" id="viewLaunch" role="tabpanel" aria-labelledby="launchViewTab">
       <section class="layout" id="launcher">
         <!-- Control panel ------------------------------------------------ -->
         <section class="panel" aria-labelledby="setupTitle">
@@ -242,8 +265,188 @@
           </div>
         </section>
       </section>
+      </div>
+
+      <!-- ============ SCHEDULE WORKSPACE ============================== -->
+      <div class="view" id="viewSchedule" role="tabpanel" aria-labelledby="scheduleViewTab" hidden>
+        <section class="layout">
+          <!-- Task builder ------------------------------------------------ -->
+          <section class="panel" aria-labelledby="scheduleTitle">
+            <div class="panel-head">
+              <h2 id="scheduleTitle">Schedule a task</h2>
+              <p>Run one fixed prompt against a Langflow flow on a repeating schedule.</p>
+            </div>
+
+            <div class="panel-body">
+              <div class="field">
+                <label for="taskName">Task name</label>
+                <input id="taskName" autocomplete="off" placeholder="Morning briefing" />
+              </div>
+
+              <div class="field">
+                <label for="taskHost">Langflow host URL</label>
+                <input id="taskHost" autocomplete="off" placeholder="http://localhost:7860" />
+              </div>
+
+              <div class="field">
+                <label for="taskFlow">Flow ID</label>
+                <input
+                  id="taskFlow"
+                  autocomplete="off"
+                  placeholder="d6c10bc7-91c9-4bb2-95e1-f0c0058a131f"
+                />
+              </div>
+
+              <div class="field">
+                <label for="taskKey">Langflow API key</label>
+                <div class="input-row">
+                  <input
+                    id="taskKey"
+                    type="password"
+                    autocomplete="off"
+                    placeholder="Paste a Langflow API key"
+                  />
+                  <button class="btn btn-secondary" id="toggleTaskKeyBtn" type="button">
+                    Show
+                  </button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="taskPrompt">Prompt to run each time</label>
+                <textarea
+                  id="taskPrompt"
+                  spellcheck="true"
+                  placeholder="Summarize today's top priorities and send me a short briefing."
+                ></textarea>
+                <p class="helper">
+                  This exact text is sent to the flow as the chat input on every run.
+                </p>
+              </div>
+
+              <div class="field">
+                <label>Frequency</label>
+                <div class="tabs seg-4" role="tablist" aria-label="Schedule frequency">
+                  <button class="tab freq-tab" type="button" data-freq="minutes" aria-selected="false">Minutes</button>
+                  <button class="tab freq-tab" type="button" data-freq="hours" aria-selected="true">Hours</button>
+                  <button class="tab freq-tab" type="button" data-freq="daily" aria-selected="false">Daily</button>
+                  <button class="tab freq-tab" type="button" data-freq="weekly" aria-selected="false">Weekly</button>
+                </div>
+              </div>
+
+              <!-- interval config (minutes/hours) -->
+              <div class="field" id="intervalConfig">
+                <label for="intervalN">Run every</label>
+                <div class="interval-row">
+                  <input id="intervalN" type="number" min="1" step="1" value="6" inputmode="numeric" />
+                  <span class="interval-unit" id="intervalUnit">hours</span>
+                </div>
+              </div>
+
+              <!-- time-of-day config (daily/weekly) -->
+              <div class="field" id="timeConfig" hidden>
+                <label for="timeOfDay">At time (this browser's timezone)</label>
+                <input id="timeOfDay" type="time" value="09:00" />
+              </div>
+
+              <!-- weekday config (weekly) -->
+              <div class="field" id="weekdayConfig" hidden>
+                <label for="weekday">On day</label>
+                <select id="weekday">
+                  <option value="1">Monday</option>
+                  <option value="2">Tuesday</option>
+                  <option value="3">Wednesday</option>
+                  <option value="4">Thursday</option>
+                  <option value="5">Friday</option>
+                  <option value="6">Saturday</option>
+                  <option value="0">Sunday</option>
+                </select>
+              </div>
+
+              <div class="actions">
+                <button class="btn btn-primary" id="addTaskBtn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 2" />
+                  </svg>
+                  Schedule task
+                </button>
+                <button class="btn btn-secondary" id="resetTaskBtn" type="button">Reset</button>
+              </div>
+
+              <div class="notice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="4" y="10" width="16" height="10" rx="2" />
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                </svg>
+                <span>Schedules live in this browser and only fire while this page is open. For always-on runs, export them to the Node runner (see the panel actions).</span>
+              </div>
+
+              <p class="error" id="taskError" role="alert"></p>
+            </div>
+          </section>
+
+          <!-- Scheduled tasks + run log ------------------------------------ -->
+          <section class="preview-shell" aria-labelledby="tasksTitle">
+            <div class="preview-head">
+              <div class="preview-copy">
+                <h2 id="tasksTitle">Scheduled tasks</h2>
+                <p id="tasksSubhead">Active schedules and their recent runs appear here.</p>
+              </div>
+              <div class="preview-meta">
+                <span class="chip" id="schedulerChip" data-state="idle">Idle</span>
+                <button class="btn btn-secondary" id="exportBtn" type="button" disabled>
+                  Export for runner
+                </button>
+              </div>
+            </div>
+
+            <div class="telemetry" aria-label="Scheduler telemetry">
+              <div class="telemetry-cell">
+                <span class="k">Active tasks</span>
+                <span class="v" id="telTaskCount">0</span>
+              </div>
+              <div class="telemetry-cell">
+                <span class="k">Next run</span>
+                <span class="v" id="telNextRun">—</span>
+              </div>
+              <div class="telemetry-cell">
+                <span class="k">Total runs</span>
+                <span class="v" id="telRunCount">0</span>
+              </div>
+            </div>
+
+            <div class="sched-stage">
+              <div class="empty-preview" id="emptyTasks">
+                <div class="empty-preview-inner">
+                  <span class="standby-tag">No schedules yet</span>
+                  <div class="empty-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="8.5" />
+                      <path d="M12 7.5V12l3 1.8" />
+                    </svg>
+                  </div>
+                  <h3>Nothing scheduled</h3>
+                  <p>Fill in a prompt and a frequency, then schedule your first task.</p>
+                </div>
+              </div>
+
+              <div class="sched-body" id="schedBody" hidden>
+                <div class="task-list" id="taskList" aria-label="Scheduled tasks"></div>
+
+                <div class="log-head">
+                  <h3>Run log</h3>
+                  <button class="btn btn-secondary btn-sm" id="clearLogBtn" type="button">Clear log</button>
+                </div>
+                <div class="run-log" id="runLog" aria-label="Run log" aria-live="polite"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
     </main>
 
     <script src="launcher.js"></script>
+    <script src="scheduler.js"></script>
   </body>
 </html>
