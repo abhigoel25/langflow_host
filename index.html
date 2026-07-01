@@ -284,27 +284,30 @@
               </div>
 
               <div class="field">
-                <label for="taskHost">Langflow host URL</label>
-                <input id="taskHost" autocomplete="off" placeholder="http://localhost:7860" />
-              </div>
-
-              <div class="field">
-                <label for="taskFlow">Flow ID</label>
-                <input
-                  id="taskFlow"
+                <label for="taskSnippet">Embed snippet</label>
+                <textarea
+                  id="taskSnippet"
+                  spellcheck="false"
                   autocomplete="off"
-                  placeholder="d6c10bc7-91c9-4bb2-95e1-f0c0058a131f"
-                />
+                  placeholder='<script src="..."></script>&#10;<langflow-chat host_url="..." flow_id="..." window_title="My Agent"></langflow-chat>'
+                ></textarea>
+                <p class="helper">
+                  Paste the same Langflow embed snippet you use to launch — the host
+                  URL and flow ID are read from it automatically.
+                </p>
               </div>
 
               <div class="field">
-                <label for="taskKey">Langflow API key</label>
+                <label for="taskKey">
+                  Langflow API key
+                  <span class="optional">or in snippet</span>
+                </label>
                 <div class="input-row">
                   <input
                     id="taskKey"
                     type="password"
                     autocomplete="off"
-                    placeholder="Paste a Langflow API key"
+                    placeholder="Paste a key, or include api_key in the snippet"
                   />
                   <button class="btn btn-secondary" id="toggleTaskKeyBtn" type="button">
                     Show

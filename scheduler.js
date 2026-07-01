@@ -17,8 +17,7 @@ const viewLaunch = document.querySelector("#viewLaunch");
 const viewSchedule = document.querySelector("#viewSchedule");
 
 const taskName = document.querySelector("#taskName");
-const taskHost = document.querySelector("#taskHost");
-const taskFlow = document.querySelector("#taskFlow");
+const taskSnippet = document.querySelector("#taskSnippet");
 const taskKey = document.querySelector("#taskKey");
 const taskPrompt = document.querySelector("#taskPrompt");
 const toggleTaskKeyBtn = document.querySelector("#toggleTaskKeyBtn");
@@ -162,17 +161,44 @@ function showTaskError(message) {
   taskError.style.display = "block";
 }
 
+// Pull host, flow ID, and (optionally) the API key out of a Langflow embed
+// snippet — the same snippet used on the Launch tab.
+function parseSnippet(raw) {
+  const doc = new DOMParser().parseFromString(raw || "", "text/html");
+  const chat = doc.querySelector("langflow-chat");
+  if (!chat)
+    throw new Error(
+      "Paste the full Langflow embed snippet, including the <langflow-chat …> tag."
+    );
+  const host = (chat.getAttribute("host_url") || "").trim().replace(/\/+$/, "");
+  const flowId = (chat.getAttribute("flow_id") || "").trim();
+  const key = (chat.getAttribute("api_key") || "").trim();
+  if (!host || !flowId)
+    throw new Error("The snippet is missing host_url or flow_id.");
+  return { host, flowId, key };
+}
+
 function addTask() {
   clearTaskError();
   const name = taskName.value.trim();
-  const host = taskHost.value.trim().replace(/\/+$/, "");
-  const flowId = taskFlow.value.trim();
-  const apiKey = taskKey.value.trim();
   const prompt = taskPrompt.value.trim();
 
   if (!name) return showTaskError("Give the task a name.");
-  if (!host || !flowId || !apiKey)
-    return showTaskError("Host URL, flow ID, and API key are all required.");
+
+  let parsed;
+  try {
+    parsed = parseSnippet(taskSnippet.value);
+  } catch (err) {
+    return showTaskError(err.message);
+  }
+  const host = parsed.host;
+  const flowId = parsed.flowId;
+  const apiKey = taskKey.value.trim() || parsed.key;
+
+  if (!apiKey)
+    return showTaskError(
+      "Add a Langflow API key, or include api_key in the snippet."
+    );
   if (!prompt) return showTaskError("Add the prompt to run each time.");
 
   const n = Math.max(1, Math.floor(Number(intervalN.value) || 1));
